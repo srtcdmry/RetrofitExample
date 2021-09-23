@@ -1,4 +1,4 @@
-package com.info.retrofitexample;
+package com.info.retrofitexampleroom;
 
 import java.util.List;
 import java.util.Map;
@@ -19,6 +19,11 @@ import retrofit2.http.QueryMap;
 import retrofit2.http.Url;
 
 public interface JsonPlaceHolderApi {
+    @GET("posts")
+    Call <List<Post>> getAllPosts();
+
+    @GET("posts/3/comments")
+    Call <List<Comment>> getAllComments();
 
     @GET("posts")
     Call<List<Post>> getPosts(
@@ -27,6 +32,7 @@ public interface JsonPlaceHolderApi {
             @Query("userId") Integer[] userId,
             @Query("_sort") String sort,
             @Query("_order") String order);
+
 
     @GET("posts")
     Call<List<Post>> getPosts(@QueryMap Map<String,String> parameters);  // string-> userId, strin-> userId2 gibi
@@ -61,5 +67,7 @@ public interface JsonPlaceHolderApi {
 
     @DELETE("posts/{id}")
     Call<Void> deletePost(@Path("id") int id);
+
+
 
 }

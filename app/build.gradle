@@ -6,7 +6,7 @@ android {
     compileSdk 30
 
     defaultConfig {
-        applicationId "com.info.retrofitexample"
+        applicationId "com.info.retrofitexampleroom"
         minSdk 22
         targetSdk 31
         versionCode 1
@@ -40,7 +40,11 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
-
+    implementation 'androidx.room:room-common:2.3.0'
+    implementation 'android.arch.persistence.room:runtime:1.1.1'
+    implementation 'com.google.firebase:firebase-firestore:22.1.2'
+    annotationProcessor 'android.arch.persistence.room:compiler:1.1.1'
+    androidTestImplementation 'android.arch.persistence.room:testing:1.1.1'
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

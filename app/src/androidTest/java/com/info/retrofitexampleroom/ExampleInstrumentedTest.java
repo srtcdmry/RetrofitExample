@@ -1,4 +1,4 @@
-package com.info.retrofitexample;
+package com.info.retrofitexampleroom;
 
 import android.content.Context;
 

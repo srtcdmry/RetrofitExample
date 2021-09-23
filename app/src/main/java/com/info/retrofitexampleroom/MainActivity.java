@@ -1,13 +1,28 @@
-package com.info.retrofitexample;
+package com.info.retrofitexampleroom;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.info.retrofitexampleroom.comment.CommentAdapter;
+import com.info.retrofitexampleroom.comment.CommentRepository;
+import com.info.retrofitexampleroom.comment.CommentViewModel;
+import com.info.retrofitexampleroom.post.PostAdapter;
+import com.info.retrofitexampleroom.post.PostRepesitory;
+import com.info.retrofitexampleroom.post.PostViewModel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,12 +38,75 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity {
     private TextView textViewResult;
     private JsonPlaceHolderApi jsonPlaceHolderApi;
+    private RecyclerView recyclerView;
+    private PostAdapter postAdapter;
+   // private CommentAdapter commentAdapter;
+    //private List<Comment> commentList;
+    private List<Post> postList;
+    //private CommentRepository commentRepository;
+    private PostRepesitory postRepesitory;
+    private static final String URL_DATA="https://jsonplaceholder.typicode.com/";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         textViewResult = findViewById(R.id.text_view_result);
+        recyclerView=findViewById(R.id.recyclerview);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+
+        postRepesitory=new PostRepesitory(getApplication());
+     //   commentRepository=new CommentRepository(getApplication());
+        postAdapter=new PostAdapter(this,postList);
+      //  commentAdapter=new CommentAdapter(this,commentList);
+        postList=new ArrayList<>();
+       // commentList=new ArrayList<>();
+
+
+
+
+       // PostViewModel postViewModel= new ViewModelProvider(this).get(PostViewModel.class);
+        PostViewModel postViewModel = new ViewModelProvider(this, ViewModelProvider
+                .AndroidViewModelFactory
+                .getInstance(getApplication()))
+                .get(PostViewModel.class);
+        postViewModel.getAllPosts().observe(this,new Observer<List<Post>>(){
+
+                    @Override
+                    public void onChanged(List<Post> postList) {
+                        //Toast.makeText(MainActivity.this,"Working ",Toast.LENGTH_SHORT).show();
+                        postAdapter.getAllPosts(postList);
+                        recyclerView.setAdapter(postAdapter);
+                        Log.d("main","onChanged:"+postList);
+                    }
+                });
+
+       networkRequest();
+
+//        Intent intent= new Intent(MainActivity.this,MainActivity2.class);
+//        startActivity(intent);
+
+
+//        CommentViewModel commentViewModel = new ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication())).get(CommentViewModel.class);
+//        commentViewModel.getAllComments().observe(this,new Observer<List<Comment>>(){
+//
+//            @Override
+//            public void onChanged(List<Comment> CommentList) {
+//                //Toast.makeText(MainActivity.this,"Working ",Toast.LENGTH_SHORT).show();
+//                commentAdapter.getAllComments(commentList);
+//                recyclerView.setAdapter(commentAdapter);
+//                Log.d("MAIN2","onChanged:"+commentList);
+//            }
+//        });
+//
+//        networkRequest2();
+
+
+
 
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -48,11 +126,36 @@ public class MainActivity extends AppCompatActivity {
 
         jsonPlaceHolderApi = retrofit.create(JsonPlaceHolderApi.class);
 
+        Intent intent = new Intent(MainActivity.this,MainActivity2.class);
+        startActivity(intent);
        // getPosts();
         //getComments();
         //createPost();
-        updatePost();
+        //updatePost();
         //deletePost();
+    }
+
+
+    private void networkRequest(){
+        Retrofit retrofit=new Retrofit.Builder()
+                .baseUrl(URL_DATA)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        JsonPlaceHolderApi api =retrofit.create(JsonPlaceHolderApi.class);
+        Call<List<Post>> call = api.getAllPosts();
+        call.enqueue(new Callback<List<Post>>() {
+            @Override
+            public void onResponse(Call<List<Post>> call, Response<List<Post>> response) {
+                if(response.isSuccessful()){
+                    postRepesitory.insert(response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Post>> call, Throwable t) {
+                Toast.makeText(MainActivity.this,"something went wrong...",Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void getPosts(){
@@ -206,4 +309,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
 }
