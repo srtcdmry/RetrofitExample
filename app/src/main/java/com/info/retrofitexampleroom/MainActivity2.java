@@ -59,7 +59,7 @@ public class MainActivity2 extends AppCompatActivity {
             public void onChanged(List<Comment> comments) {
                 commentAdapter.getAllComments(commentList);
                 recyclerView2.setAdapter(commentAdapter);
-                Log.d("Main","onChanged:"+commentList);
+                Log.d("Main","onChanged:"+ comments);
             }
         });
         networkRequest2();
